@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: ccpa-helpers
+Version: 0.1.dev70+gdb7f688.d20231217
+Summary: Synthetic Data for CCPA
+Home-page: https://github.com/gretelai/ccpa-helpers
+License: https://gretel.ai/license/source-available-license
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: Free To Use But Restricted
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.7
+License-File: LICENSE
+Requires-Dist: gretel-client
+Requires-Dist: pandas
+Requires-Dist: smart-open
+Requires-Dist: Jinja2

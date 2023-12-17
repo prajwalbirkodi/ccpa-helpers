@@ -1,0 +1,17 @@
+CustomerID,Title,FirstName,MiddleName,LastName,Suffix,AddressLine1,AddressLine2,City,StateProvinceName,CountryRegionName,PostalCode,PhoneNumber,BirthDate,Education,Occupation,Gender,MaritalStatus,HomeOwnerFlag,NumberCarsOwned,NumberChildrenAtHome,TotalChildren,YearlyIncome,BikeBuyer,SSN
+11000,,Jon,V,Yang,,3761 N. 14th St,,Rockhampton,Queensland,Australia,4700,1 (11) 500 555-0162,4/8/1966,Bachelors ,Professional,M,M,1,0,0,2,137947,0,123-45-6789
+11001,,Eugene,L,Huang,,2243 W St.,,Seaford,Victoria,Australia,3198,1 (11) 500 555-0110,5/14/1965,Bachelors ,Professional,M,S,0,1,3,3,101141,1,234-56-7890
+11002,,Ruben,,Torres,,5844 Linden Land,,Hobart,Tasmania,Australia,7001,1 (11) 500 555-0184,8/12/1965,Bachelors ,Professional,M,M,1,1,3,3,91945,0,345-67-8901
+11003,,Christy,,Zhu,,1825 Village Pl.,,North Ryde,New South Wales,Australia,2113,1 (11) 500 555-0162,2/15/1968,Bachelors ,Professional,F,S,0,1,0,0,86688,0,456-78-9012
+11004,,Elizabeth,,Johnson,,7553 Harness Circle,,Wollongong,New South Wales,Australia,2500,1 (11) 500 555-0131,8/8/1968,Bachelors ,Professional,F,S,1,4,5,5,92771,1,567-89-0123
+11005,,Julio,,Ruiz,,7305 Humphrey Drive,,East Brisbane,Queensland,Australia,4169,1 (11) 500 555-0151,8/5/1965,Bachelors ,Professional,M,S,1,1,0,0,103199,1,678-90-1234
+11006,,Janet,G,Alvarez,,2612 Berry Dr,,Matraville,New South Wales,Australia,2036,1 (11) 500 555-0184,12/6/1965,Bachelors ,Professional,F,S,1,1,0,0,84756,1,789-01-2345
+11007,,Marco,,Mehta,,942 Brook Street,,Warrnambool,Victoria,Australia,3280,1 (11) 500 555-0126,5/9/1964,Bachelors ,Professional,M,M,1,2,3,3,109759,1,890-12-3456
+11008,,Rob,,Verhoff,,624 Peabody Road,,Bendigo,Victoria,Australia,3550,1 (11) 500 555-0164,7/7/1964,Bachelors ,Professional,F,S,1,3,4,4,88005,1,901-23-4567
+11009,,Shannon,C,Carlson,,3839 Northgate Road,,Hervey Bay,Queensland,Australia,4655,1 (11) 500 555-0110,4/1/1964,Bachelors ,Professional,M,S,0,1,0,0,106399,0,012-34-5678
+11010,,Jacquelyn,C,Suarez,,7800 Corrinne Court,,East Brisbane,Queensland,Australia,4169,1 (11) 500 555-0169,2/6/1964,Bachelors ,Professional,F,S,0,1,0,0,81294,0,123-45-6789
+11011,,Curtis,,Lu,,1224 Shoenic,,East Brisbane,Queensland,Australia,4169,1 (11) 500 555-0117,11/4/1963,Bachelors ,Professional,M,M,1,4,4,4,94029,1,234-56-7890
+11012,,Lauren,M,Walker,,4785 Scott Street,,Bremerton,Washington,United States,98312,717-555-0164,1/18/1968,Bachelors ,Management,F,M,1,2,0,2,99245,1,345-67-8901
+11013,,Ian,M,Jenkins,,7902 Hudson Ave.,,Lebanon,Oregon,United States,97355,817-555-0185,8/6/1968,Bachelors ,Management,M,M,1,3,0,2,115859,0,456-78-9012
+11014,,Sydney,,Bennett,,9011 Tank Drive,,Redmond,Washington,United States,98052,431-555-0156,5/9/1968,Bachelors ,Management,F,S,0,3,0,3,105157,0,567-89-0123
+11015,,Chloe,,Young,,244 Willow Pass Road,,Burbank,California,United States,91502,208-555-0142,2/27/1979,Partial College,Skilled Manual,F,S,0,1,0,0,40011,0,678-90-1234
