@@ -9,7 +9,7 @@ git clone https://github.com/gretelai/ccpa-helpers.git
 # create venv
 cd ccpa-helpers
 python -m venv ./venv
-source venv/bin/activate
+source venv/Scripts/activate
 
 # install ccpa-helpers package
 pip install -U .
