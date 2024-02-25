@@ -1,0 +1,17 @@
+CustomerID,Title,FirstName,MiddleName,LastName,Suffix,Email,AddressLine1,AddressLine2,City,State,CountryRegionName,PostalCode,PhoneNumber,BirthDate,Gender,MaritalStatus,YearlyIncome,SSN
+11000,,Jon,V,Yang,,eakeley542@mycompany.co,3761 N. 14th St,,Rockhampton,Michigan,United States,4700,1 (11) 500 555-0162,4/8/1966,M,M,137947,123-45-6789
+11001,,Eugene,L,Huang,,boddie319@mycompany.co,2243 W St.,,Seaford,Indiana,United States,3198,1 (11) 500 555-0110,5/14/1965,M,S,101141,234-56-7890
+11002,,Ruben,,Torres,,kennermann871@mycompany.co,5844 Linden Land,,Hobart,Illinois,United States,7001,1 (11) 500 555-0184,8/12/1965,M,M,91945,345-67-8901
+11003,,Christy,,Zhu,,skule189@mycompany.co,1825 Village Pl.,,North Ryde,Washington,United States,2113,1 (11) 500 555-0162,2/15/1968,F,S,86688,456-78-9012
+11004,,Elizabeth,,Johnson,,eubank797@mycompany.co,7553 Harness Circle,,Wollongong,North Dakota,United States,2500,1 (11) 500 555-0131,8/8/1968,F,S,92771,567-89-0123
+11005,,Julio,,Ruiz,,spleving989@mycompany.co,7305 Humphrey Drive,,East Brisbane,Wisconsin,United States,4169,1 (11) 500 555-0151,8/5/1965,M,S,103199,678-90-1234
+11006,,Janet,G,Alvarez,,kennermann871@mycompany.co,2612 Berry Dr,,Matraville,California,United States,2036,1 (11) 500 555-0184,12/6/1965,F,S,84756,789-01-2345
+11007,,Marco,,Mehta,,bdambrosiep@fema.gov,942 Brook Street,,Warrnambool,New York,United States,3280,1 (11) 500 555-0126,5/9/1964,M,M,109759,890-12-3456
+11008,,Rob,,Verhoff,,skule189@mycompany.co,624 Peabody Road,,Bendigo,New Jersey,United States,3550,1 (11) 500 555-0164,7/7/1964,F,S,88005,901-23-4567
+11009,,Shannon,C,Carlson,,lowing81@mycompany.co,3839 Northgate Road,,Hervey Bay,Florida,United States,4655,1 (11) 500 555-0110,4/1/1964,M,S,106399,012-34-5678
+11010,,Jacquelyn,C,Suarez,,bgregolottij2@weebly.com,7800 Corrinne Court,,East Brisbane,Alabama,United States,4169,1 (11) 500 555-0169,2/6/1964,F,S,81294,123-45-6789
+11011,,Curtis,,Lu,,cfelmingham79@multiply.com,1224 Shoenic,,East Brisbane,Delaware,United States,4169,1 (11) 500 555-0117,11/4/1963,M,M,94029,234-56-7890
+11012,,Lauren,M,Walker,,eubank797@mycompany.co,4785 Scott Street,,Bremerton,Washington,United States,98312,717-555-0164,1/18/1968,F,M,99245,345-67-8901
+11013,,Ian,M,Jenkins,,eubank797@mycompany.co,7902 Hudson Ave.,,Lebanon,Oregon,United States,97355,817-555-0185,8/6/1968,M,M,115859,456-78-9012
+11014,,Sydney,,Bennett,,eubank797@mycompany.co,9011 Tank Drive,,Redmond,Washington,United States,98052,431-555-0156,5/9/1968,F,S,105157,567-89-0123
+11015,,Chloe,,Young,,cfelmingham79@multiply.com,244 Willow Pass Road,,Burbank,California,United States,91502,208-555-0142,2/27/1979,F,S,40011,678-90-1234
