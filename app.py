@@ -1,7 +1,7 @@
 import os
 import subprocess
 import streamlit as st
-from ccpa_helpers import CCPAAnonymizer
+from src.ccpa_helpers import CCPAAnonymizer
 import pandas as pd
 import webbrowser
 
