@@ -1,1 +1,1 @@
-from ccpa_helpers.ccpaanonymizer import CCPAAnonymizer
+from src.ccpa_helpers.ccpaanonymizer import CCPAAnonymizer
