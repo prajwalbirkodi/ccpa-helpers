@@ -1,2 +1,0 @@
-ccpa_helpers
-config
