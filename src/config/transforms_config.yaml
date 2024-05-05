@@ -10,6 +10,14 @@ models:
             locales:
               - en_US
           rules:
+            - name: exclude_primary_keys
+              conditions:
+                field_name:
+                  - CustomerID
+                  - FirstName
+                  
+              transforms:
+                - type: passthrough  # Exclude transformation for primary key columns
             - name: fake_email
               conditions:
                 field_label:
@@ -124,9 +132,4 @@ models:
                     length: 8
 label_predictors:
   namespace: ccpa
-  # If >= 80% of the values in a field / column
-  # match any single entity, classify the entire field / column
-  # with that label. When using `field_label` conditions over
-  # `field_value` conditions, which search each field, this
-  # can drastically speed up data transformation.
   field_label_threshold: 0.80

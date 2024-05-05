@@ -44,7 +44,7 @@ class CCPAAnonymizer:
         run_mode: str = "cloud",
         preview_recs: int = PREVIEW_RECS,
         show_real_data: bool = True,
-        output_dir: str = "artifacts",
+        output_dir: str = None,
         tmp_dir: str = "tmp",
         overwrite: bool = False,
         endpoint: str = None,
@@ -56,7 +56,7 @@ class CCPAAnonymizer:
         self.run_mode = run_mode
         self.preview_recs = preview_recs
         self.show_real_data = show_real_data
-        self.output_dir = Path(output_dir)
+        self.output_dir = Path("~/Documents/anonymizer/artifacts").expanduser() if output_dir is None else Path(output_dir)
         self.tmp_dir = Path(tmp_dir)
         self.anonymization_report_path = None
         self.anonymized_path = None
@@ -73,40 +73,45 @@ class CCPAAnonymizer:
         self.ner_report = {}
         self.run_report = {}
         self.syn_report = {}
+        self.project = None
 
-        if endpoint:
-            configure_session(
-                api_key="prompt", cache="yes", validate=True, endpoint=endpoint
-            )
-        else:
-            configure_session(api_key="prompt", cache="yes", validate=True)
-
-        self.project = create_or_get_unique_project(name=project_name)
-        print(f"Follow along with model training at: {self.project.get_console_url()}")
-
-        if self.run_mode not in ["cloud", "hybrid"]:
-            raise ValueError("run_mode must be either 'cloud' or 'hybrid'")
         if overwrite:
             if self.tmp_dir.exists() and self.tmp_dir.is_dir():
                 rmtree(self.tmp_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.tmp_dir.mkdir(parents=True, exist_ok=True)
 
-    def anonymize(self, dataset_path: str):
+        try:
+            self.project = create_or_get_unique_project(name=self.project_name)
+            print(f"Follow along with model training at: {self.project.get_console_url()}")
+        except Exception as e:
+            print(f"Error initializing project: {e}")
+
+    def anonymize(self, dataset_path: str, transform_locally: bool, transform_in_cloud: bool, synthesize_locally: bool, synthesize_in_cloud: bool, endpoint: Optional[str] = None):
         """Anonymize a dataset to CCPA standards
         using a pipeline of named entity recognition, data transformations,
         and synthetic data model training and generation.
 
         Args:
             dataset_path (str): Path or URL to CSV
+            endpoint (str, optional): Gretel API endpoint. Defaults to None.
         """
         print(f"Anonymizing '{dataset_path}'")
+        print(f"Transform Locally: {transform_locally}")
+        print(f"Transform in Cloud: {transform_in_cloud}")
+        print(f"Synthesize Locally: {synthesize_locally}")
+        print(f"Synthesize in Cloud: {synthesize_in_cloud}")
+
         self.dataset_path = dataset_path
         self._preprocess_data(dataset_path)
-        self.transform()
-        self.synthesize()
-        self._save_reports(self.anonymization_report_path)
-
+        if transform_locally:
+            self.transform_locally()
+        elif transform_in_cloud:
+            self.transform_cloud()
+        if synthesize_locally:
+            self.synthesize_locally()
+        elif synthesize_in_cloud:
+            self.synthesize_cloud()
         print("Anonymization complete")
         print(f" -- Synthetic data stored to: {self.anonymized_path}")
         print(f" -- Anonymization report stored to: {self.anonymization_report_path}")
@@ -156,8 +161,8 @@ class CCPAAnonymizer:
         self._cache_run_report = Path(self.tmp_dir / f"{prefix}-run_report.pkl")
         self._cache_syn_report = Path(self.tmp_dir / f"{prefix}-syn_report.pkl")
 
-    def _transform_hybrid(self, config: dict):
-        """Gretel hybrid cloud API."""
+    def _transform_local(self, config: dict):
+        """Run data transformation locally."""
         df = pd.read_csv(self.training_path)
         df.head(self.preview_recs).to_csv(self.preview_path, index=False)
         transform_train = self.project.create_model_obj(config, str(self.preview_path))
@@ -197,29 +202,18 @@ class CCPAAnonymizer:
         self.deid_df = pd.read_csv(rh.get_artifact_link("data"), compression="gzip")
         self.deid_df.to_csv(self.deidentified_path, index=False)
 
-    def transform(self):
+    def transform_locally(self):
         """Deidentify a dataset using Gretel's Transform APIs."""
         config = read_model_config(self.transforms_config)
+        self._transform_local(config)
+    
+    def transform_cloud(self):
+        """Deidentify a dataset using Gretel's Transform APIs."""
+        config = read_model_config(self.transforms_config)
+        self._transform_cloud(config)
 
-        if self._cache_ner_report.exists() and self._cache_run_report.exists():
-            self.ner_report = pickle.load(open(self._cache_ner_report, "rb"))
-            self.run_report = pickle.load(open(self._cache_run_report, "rb"))
-            self.deid_df = pd.read_csv(self.deidentified_path)
-        else:
-            # Initialize transform model
-            if self.run_mode == "cloud":
-                self._transform_cloud(config=config)
-            elif self.run_mode == "hybrid":
-                self._transform_hybrid(config=config)
 
-            pickle.dump(self.ner_report, open(self._cache_ner_report, "wb"))
-            pickle.dump(self.run_report, open(self._cache_run_report, "wb"))
-            self.deid_df.to_csv(self.deidentified_path, index=False)
-
-        print(reports.ner_report(self.ner_report)["md"])
-        print(reports.transform_report(self.run_report)["md"])
-
-    def synthesize(self):
+    def synthesize_cloud(self):
         """Train a synthetic data model on a dataset and use it to create an artificial
         version of a dataset with increased privacy guarantees.
         """
@@ -235,10 +229,27 @@ class CCPAAnonymizer:
             self.syn_report = pickle.load(open(self._cache_syn_report, "rb"))
             self.synthetic_df = pd.read_csv(self.anonymized_path)
         else:
-            if self.run_mode == "cloud":
-                self._synthesize_cloud(config=config)
-            elif self.run_mode == "hybrid":
-                self._synthesize_hybrid(config=config)
+            self._synthesize_cloud(config=config)
+
+        print(reports.synthesis_report(self.syn_report)["md"])
+
+    def synthesize_locally(self):
+        """Train a synthetic data model on a dataset and use it to create an artificial
+        version of a dataset with increased privacy guarantees.
+        """
+        config = read_model_config(self.synthetics_config)
+
+        model_config = config["models"][0]
+        model_type = next(iter(model_config.keys()))
+
+        model_config[model_type]["generate"] = {"num_records": len(self.deid_df)}
+        model_config[model_type]["data_source"] = str(self.deidentified_path)
+
+        if self._cache_syn_report.exists():
+            self.syn_report = pickle.load(open(self._cache_syn_report, "rb"))
+            self.synthetic_df = pd.read_csv(self.anonymized_path)
+        else:
+            self._synthesize_hybrid(config=config)
 
         print(reports.synthesis_report(self.syn_report)["md"])
 
@@ -271,3 +282,13 @@ class CCPAAnonymizer:
         self.syn_report = json.loads(open(self.tmp_dir / "report_json.json.gz").read())
         self.syn_report.update(model._data["billing_data"])
         pickle.dump(self.syn_report, open(self._cache_syn_report, "wb"))
+
+
+    def _configure_session_after_transform(self, endpoint: Optional[str] = None):
+        """Configure Gretel session after local transformation."""
+        if endpoint:
+            configure_session(
+                api_key="prompt", cache="yes", validate=True, endpoint=endpoint
+            )
+        else:
+            configure_session(api_key="prompt", cache="yes", validate=True)

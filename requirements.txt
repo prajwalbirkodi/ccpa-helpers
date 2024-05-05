@@ -2,3 +2,4 @@ gretel-client
 pandas
 smart-open
 Jinja2
+streamlit
