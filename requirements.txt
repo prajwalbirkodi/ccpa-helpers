@@ -1,4 +1,5 @@
--e .
+setuptools
+setuptools_scm
 pandas
 gretel-client
 smart_open

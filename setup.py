@@ -7,12 +7,12 @@ install_requires = (local_path / "requirements.txt").read_text().splitlines()
 setup(
     name="ccpa-helpers",
     use_scm_version=True,
-    setup_requires=["setuptools_scm"],
+    setup_requires=["setuptools", "setuptools_scm"],  # Ensure setuptools_scm is included
     package_dir={"": "src"},
     install_requires=install_requires,
     python_requires=">=3.7",
     packages=find_packages("src"),
-    package_data={"": ["*config/*.yaml"]},  # Ensure YAML files in config directory are included
+    package_data={"": ["*.yaml"]},
     include_package_data=True,
     description="Synthetic Data for CCPA",
     url="https://github.com/gretelai/ccpa-helpers",
