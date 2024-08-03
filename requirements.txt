@@ -1,5 +1,5 @@
-gretel-client
+-e .
 pandas
-smart-open
-Jinja2
+gretel-client
+smart_open
 streamlit
