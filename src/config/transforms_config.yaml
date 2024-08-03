@@ -1,0 +1,135 @@
+schema_version: "1.0"
+name: "ccpa-transforms"
+models:
+  - transforms:
+      data_source: "_"
+      use_nlp: False
+      policies:
+        - name: deidentify_pii
+          transform_attrs:
+            locales:
+              - en_US
+          rules:
+            - name: exclude_primary_keys
+              conditions:
+                field_name:
+                  - CustomerID
+                  - FirstName
+                  
+              transforms:
+                - type: passthrough  # Exclude transformation for primary key columns
+            - name: fake_email
+              conditions:
+                field_label:
+                  - email_address
+              transforms:
+                - type: fake
+                  attrs:
+                    method: email
+                    params: {domain: ccpa.com}
+            - name: city
+              conditions:
+                field_name_regex:
+                  - '(?i)^((city|metropolitan|metro)[\s\-_\.\/]*(name|area)|city|cities|towns?|townships?|capitals?|municipality|city\/town|town\/city)[:\-]*$'
+              transforms:
+                - type: fake
+            - name: state
+              conditions:
+                field_name_regex:
+                  - '(?i)^(states?|provinces?|states?\/provinces?|provinces?\/states?)[:\-]*$'
+              transforms:
+                - type: fake
+            - name: country
+              conditions:
+                field_name_regex:
+                  - '(?i)^(country[\s\-_\.\/]*(name|region|territory)|country|countries|nation|province|region)[:\-]?$'
+              transforms:
+                - type: passthrough            
+            - name: last_name
+              conditions:
+                field_name_regex:
+                  - '(?i)^(last|sur|l|family)[\s\-_\.\/]*names?[:\-]*$'
+              transforms:
+                - type: fake
+                  attrs:
+                    method: last_name_nonbinary
+            - name: middle_name
+              conditions:
+                field_name_regex:
+                  - '(?i)^(middle|second|additional|m)[\s\-_\.\/]*(first|fore|primary|given)?[\s\-_\.\/]*names?[:\-]*$'
+              transforms:
+                - type: fake
+                  attrs:
+                    method: first_name_nonbinary
+            - name: first_name
+              conditions:
+                field_name_regex:
+                  - '(?i)^(first|nick|given|personal|christian|primary|fore|f)[\s\-_\.\/]*names?[:\-]*$'
+              transforms:
+                - type: fake
+                  attrs:
+                    method: first_name_nonbinary
+            - name: street_address
+              conditions:
+                field_name_regex:
+                  - '(?i)^((street|home|business)[\s\-_\.\/]*address|street|address|address.?line|headquarters|home|residence).?1?[:\-]*$'
+              transforms:
+                - type: fake
+                  attrs:
+                    method: street_address
+            - name: secondary_address
+              conditions:
+                field_name_regex:
+                  - '(?i)^((street|home|business)[\s\-_\.\/]*address|street|address|address.?line|headquarters|home|residence).?\d?[:\-]*$'
+              transforms:
+                - type: fake
+                  attrs:
+                    length: 2 
+            - name: birth_date
+              conditions:
+                field_label:
+                  - birth_date
+              transforms:
+                - type: dateshift
+                  attrs:
+                    min: 20
+                    max: 20
+                    formats: "%Y-%m-%d"
+            - name: fake_or_redact_pii
+              conditions:
+                field_label:
+                  - person_name
+                  - credit_card_number
+                  - phone_number
+                  - phone_number_namer
+                  - us_social_security_number
+                  - ip_address
+                  - credit_card_number
+              transforms:
+                - type: fake
+                - type: redact_with_char
+                  attrs:
+                    char: X
+        - name: hash_ids
+          rules:
+            - name: hash_ids
+              conditions:
+                field_name_regex:
+                  - '(?i)^.*[ _.-]id$'
+                  - '^.*[a-z]{1}ID$'
+                field_name:
+                  - id
+                field_label:
+                  - uuid
+                  - md5
+                  - sha256
+                  - sha512
+                field_attributes:
+                  is_id: true
+              transforms:
+                - type: fake
+                  attrs:
+                    length: 8
+label_predictors:
+  namespace: ccpa
+  field_label_threshold: 0.80
