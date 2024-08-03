@@ -11,8 +11,9 @@ from gretel_client.projects.models import read_model_config
 from pkg_resources import resource_filename
 from smart_open import open
 
-from . import reports
+from ccpa_helpers import reports
 from ccpa_helpers.helpers import quiet_poll
+
 
 PREVIEW_RECS = 100
 
