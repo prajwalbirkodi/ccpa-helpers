@@ -3,9 +3,9 @@ import subprocess
 import streamlit as st
 import sys
 
-sys.path.insert(0, 'src/ccpahelpers')
+sys.path.insert(0, 'src')
 
-from ccpaanonymizer import CCPAAnonymizer
+from ccpahelpers.ccpaanonymizer import CCPAAnonymizer
 import pandas as pd
 
 # Debugging information
