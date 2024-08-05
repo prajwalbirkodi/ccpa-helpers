@@ -11,7 +11,7 @@ setup(
     package_dir={"": "src"},
     install_requires=install_requires,
     python_requires=">=3.7",
-    packages=find_packages("src"),
+    packages=find_packages(where="src"),
     package_data={"": ["*.yaml"]},
     include_package_data=True,
     description="Synthetic Data for CCPA",
