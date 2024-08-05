@@ -3,7 +3,7 @@ import subprocess
 import streamlit as st
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src', 'ccpahelpers'))
+sys.path.insert(0, 'src/ccpa_helpers')
 
 from ccpaanonymizer import CCPAAnonymizer
 import pandas as pd
