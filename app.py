@@ -8,11 +8,6 @@ sys.path.insert(0, 'src')
 from ccpahelpers.ccpaanonymizer import CCPAAnonymizer
 import pandas as pd
 
-# Debugging information
-st.write("Python Path:", sys.path)
-st.write("Installed Packages:", subprocess.run(["pip", "freeze"], capture_output=True).stdout.decode())
-
-
 # Define the Streamlit app
 def main():
 
