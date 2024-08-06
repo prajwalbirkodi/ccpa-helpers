@@ -209,32 +209,4 @@ class CCPAAnonymizer:
         quiet_poll(model)
         with open(model.get_artifact_link("run_report_json")) as fh:
             self.syn_report = json.loads(fh.read())
-        self.synthetic_df = pd.read_csv(model.get_artifact_link("data"), compression="gzip")
-        self.synthetic_df.to_csv(self.anonymized_path, index=False)
-        pickle.dump(self.syn_report, open(self._cache_syn_report, "wb"))
-
-    def synthesize_locally(self):
-        config = read_model_config(self.synthetics_config)
-
-        model_config = config["models"][0]
-        model_type = next(iter(model_config.keys()))
-
-        model_config[model_type]["generate"] = {"num_records": len(self.deid_df)}
-        model_config[model_type]["data_source"] = str(self.deidentified_path)
-
-        if self._cache_syn_report.exists():
-            self.syn_report = pickle.load(open(self._cache_syn_report, "rb"))
-            self.synthetic_df = pd.read_csv(self.anonymized_path)
-        else:
-            self._synthesize_local(config=config)
-
-        print(reports.synthesis_report(self.syn_report)["html"])
-        self._save_reports(self.anonymization_report_path)
-
-    def _synthesize_local(self, config):
-        model = self.project.create_model_obj(config, data_source=self.deid_df)
-        run = submit_docker_local(model, output_dir=str(self.tmp_dir))
-        self.syn_report = json.loads(open(self.tmp_dir / "report_json.json.gz").read())
-        self.synthetic_df = pd.read_csv(self.tmp_dir / "data.gz")
-        self.synthetic_df.to_csv(self.anonymized_path, index=False)
-        pickle.dump(self.syn_report, open(self._cache_syn_report, "wb"))
+        self.synthetic_df = pd.read_csv(model.get_artifact_link("data"), compression="gzip
