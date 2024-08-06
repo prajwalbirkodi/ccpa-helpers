@@ -14,9 +14,7 @@ from smart_open import open
 from . import reports
 from .helpers import quiet_poll
 
-
 PREVIEW_RECS = 100
-
 
 class CCPAAnonymizer:
     def __init__(
@@ -198,7 +196,18 @@ class CCPAAnonymizer:
         else:
             self._synthesize_cloud(config=config)
 
-        print(reports.synthesis_report(self.syn_report)["md"])
+        print(reports.synthesis_report(self.syn_report)["html"])
+        self._save_reports(self.anonymization_report_path)
+
+    def _synthesize_cloud(self, config):
+        model = self.project.create_model_obj(config, data_source=self.deid_df)
+        model.submit_cloud()
+        quiet_poll(model)
+        with open(model.get_artifact_link("run_report_json")) as fh:
+            self.syn_report = json.loads(fh.read())
+        self.synthetic_df = pd.read_csv(model.get_artifact_link("data"), compression="gzip")
+        self.synthetic_df.to_csv(self.anonymized_path, index=False)
+        pickle.dump(self.syn_report, open(self._cache_syn_report, "wb"))
 
     def synthesize_locally(self):
         config = read_model_config(self.synthetics_config)
@@ -213,42 +222,15 @@ class CCPAAnonymizer:
             self.syn_report = pickle.load(open(self._cache_syn_report, "rb"))
             self.synthetic_df = pd.read_csv(self.anonymized_path)
         else:
-            self._synthesize_hybrid(config=config)
+            self._synthesize_local(config=config)
 
-        print(reports.synthesis_report(self.syn_report)["md"])
+        print(reports.synthesis_report(self.syn_report)["html"])
+        self._save_reports(self.anonymization_report_path)
 
-    def _synthesize_cloud(self, config: dict):
-        model = self.project.create_model_obj(
-            model_config=config, data_source=str(self.deidentified_path)
-        )
-        model.submit_cloud()
-        quiet_poll(model)
-        self.synthetic_df = pd.read_csv(
-            model.get_artifact_link("data_preview"), compression="gzip"
-        )
-        self.synthetic_df.to_csv(self.anonymized_path, index=False)
-        with open(model.get_artifact_link("report_json")) as fh:
-            self.syn_report = json.loads(fh.read())
-            self.syn_report.update(model._data["billing_data"])
-            pickle.dump(self.syn_report, open(self._cache_syn_report, "wb"))
-
-    def _synthesize_hybrid(self, config: dict):
-        model = self.project.create_model_obj(
-            model_config=config, data_source=str(self.deidentified_path)
-        )
+    def _synthesize_local(self, config):
+        model = self.project.create_model_obj(config, data_source=self.deid_df)
         run = submit_docker_local(model, output_dir=str(self.tmp_dir))
-        self.synthetic_df = pd.read_csv(
-            self.tmp_dir / "data_preview.gz", compression="gzip"
-        )
-        self.synthetic_df.to_csv(self.anonymized_path, index=False)
         self.syn_report = json.loads(open(self.tmp_dir / "report_json.json.gz").read())
-        self.syn_report.update(model._data["billing_data"])
+        self.synthetic_df = pd.read_csv(self.tmp_dir / "data.gz")
+        self.synthetic_df.to_csv(self.anonymized_path, index=False)
         pickle.dump(self.syn_report, open(self._cache_syn_report, "wb"))
-
-    def _configure_session_after_transform(self, endpoint: Optional[str] = None):
-        if endpoint:
-            configure_session(
-                api_key="prompt", cache="yes", validate=True, endpoint=endpoint
-            )
-        else:
-            configure_session(api_key="prompt", cache="yes", validate=True)
