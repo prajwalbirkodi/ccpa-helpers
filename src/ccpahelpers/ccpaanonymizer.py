@@ -130,6 +130,8 @@ class CCPAAnonymizer:
         self._cache_run_report = Path(self.tmp_dir / f"{prefix}-run_report.pkl")
         self._cache_syn_report = Path(self.tmp_dir / f"{prefix}-syn_report.pkl")
 
+        print(f"Paths set: \nTraining Path: {self.training_path}\nDeidentified Path: {self.deidentified_path}\nAnonymized Path: {self.anonymized_path}")
+
     def _transform_local(self, config: dict):
         df = pd.read_csv(self.training_path)
         df.head(self.preview_recs).to_csv(self.preview_path, index=False)
@@ -154,6 +156,7 @@ class CCPAAnonymizer:
         self.run_report = json.loads(open(self.tmp_dir / "report_json.json.gz").read())
         self.deid_df = pd.read_csv(self.tmp_dir / "data.gz")
         self.deid_df.to_csv(self.deidentified_path, index=False)
+        print(f"Deidentified data saved to: {self.deidentified_path}")
 
     def _transform_cloud(self, config: dict):
         df = pd.read_csv(self.training_path)
@@ -172,6 +175,7 @@ class CCPAAnonymizer:
             self.run_report = json.loads(fh.read())
         self.deid_df = pd.read_csv(rh.get_artifact_link("data"), compression="gzip")
         self.deid_df.to_csv(self.deidentified_path, index=False)
+        print(f"Deidentified data saved to: {self.deidentified_path}")
 
     def transform_locally(self):
         config = read_model_config(self.transforms_config)
