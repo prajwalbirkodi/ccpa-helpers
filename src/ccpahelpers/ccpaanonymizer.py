@@ -130,8 +130,6 @@ class CCPAAnonymizer:
         self._cache_run_report = Path(self.tmp_dir / f"{prefix}-run_report.pkl")
         self._cache_syn_report = Path(self.tmp_dir / f"{prefix}-syn_report.pkl")
 
-        print(f"Paths set: \nTraining Path: {self.training_path}\nDeidentified Path: {self.deidentified_path}\nAnonymized Path: {self.anonymized_path}")
-
     def _transform_local(self, config: dict):
         df = pd.read_csv(self.training_path)
         df.head(self.preview_recs).to_csv(self.preview_path, index=False)
@@ -156,7 +154,6 @@ class CCPAAnonymizer:
         self.run_report = json.loads(open(self.tmp_dir / "report_json.json.gz").read())
         self.deid_df = pd.read_csv(self.tmp_dir / "data.gz")
         self.deid_df.to_csv(self.deidentified_path, index=False)
-        print(f"Deidentified data saved to: {self.deidentified_path}")
 
     def _transform_cloud(self, config: dict):
         df = pd.read_csv(self.training_path)
@@ -175,7 +172,6 @@ class CCPAAnonymizer:
             self.run_report = json.loads(fh.read())
         self.deid_df = pd.read_csv(rh.get_artifact_link("data"), compression="gzip")
         self.deid_df.to_csv(self.deidentified_path, index=False)
-        print(f"Deidentified data saved to: {self.deidentified_path}")
 
     def transform_locally(self):
         config = read_model_config(self.transforms_config)
@@ -209,4 +205,32 @@ class CCPAAnonymizer:
         quiet_poll(model)
         with open(model.get_artifact_link("run_report_json")) as fh:
             self.syn_report = json.loads(fh.read())
-        self.synthetic_df = pd.read_csv(model.get_artifact_link("data"), compression="gzip
+        self.synthetic_df = pd.read_csv(model.get_artifact_link("data"), compression="gzip")
+        self.synthetic_df.to_csv(self.anonymized_path, index=False)
+        pickle.dump(self.syn_report, open(self._cache_syn_report, "wb"))
+
+    def synthesize_locally(self):
+        config = read_model_config(self.synthetics_config)
+
+        model_config = config["models"][0]
+        model_type = next(iter(model_config.keys()))
+
+        model_config[model_type]["generate"] = {"num_records": len(self.deid_df)}
+        model_config[model_type]["data_source"] = str(self.deidentified_path)
+
+        if self._cache_syn_report.exists():
+            self.syn_report = pickle.load(open(self._cache_syn_report, "rb"))
+            self.synthetic_df = pd.read_csv(self.anonymized_path)
+        else:
+            self._synthesize_local(config=config)
+
+        print(reports.synthesis_report(self.syn_report)["html"])
+        self._save_reports(self.anonymization_report_path)
+
+    def _synthesize_local(self, config):
+        model = self.project.create_model_obj(config, data_source=self.deid_df)
+        run = submit_docker_local(model, output_dir=str(self.tmp_dir))
+        self.syn_report = json.loads(open(self.tmp_dir / "report_json.json.gz").read())
+        self.synthetic_df = pd.read_csv(self.tmp_dir / "data.gz")
+        self.synthetic_df.to_csv(self.anonymized_path, index=False)
+        pickle.dump(self.syn_report, open(self._cache_syn_report, "wb"))
