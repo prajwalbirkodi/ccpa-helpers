@@ -67,11 +67,18 @@ class CCPAAnonymizer:
 
         try:
             self.project = create_or_get_unique_project(name=self.project_name)
-            print(f"Follow along with model training at: {self.project.get_console_url()}")
+            if self.project:
+                print(f"Project initialized successfully. Follow along with model training at: {self.project.get_console_url()}")
+            else:
+                raise RuntimeError("Failed to create or get project")
         except Exception as e:
             print(f"Error initializing project: {e}")
+            self.project = None  # Ensure project is None if initialization fails
 
     def anonymize(self, dataset_path: str, transform_locally: bool, transform_in_cloud: bool, synthesize_locally: bool, synthesize_in_cloud: bool, endpoint: Optional[str] = None):
+        if not self.project:
+            raise RuntimeError("Project initialization failed. Cannot proceed with anonymization.")
+
         print(f"Anonymizing '{dataset_path}'")
         print(f"Transform Locally: {transform_locally}")
         print(f"Transform in Cloud: {transform_in_cloud}")
