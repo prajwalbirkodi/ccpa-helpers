@@ -170,7 +170,7 @@ class CCPAAnonymizer:
         model.submit_cloud()
         quiet_poll(model)
         
-        if model.status != "COMPLETED":
+        if model.status != "Status.COMPLETED":
             raise Exception(f"Model synthesis did not complete successfully. Status: {model.status}")
     
         # Log available artifacts for debugging
