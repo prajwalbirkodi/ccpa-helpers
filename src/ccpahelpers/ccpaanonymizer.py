@@ -173,7 +173,7 @@ class CCPAAnonymizer:
         print(f"Model synthesis did not complete successfully. Status: {model.status}")
     
         # Log available artifacts for debugging
-        available_artifacts = model.get_artifact_links()
+        available_artifacts = model.get_artifact_list()
         print("Available artifacts:", available_artifacts)
         
         
@@ -223,7 +223,7 @@ class CCPAAnonymizer:
         print(f"Model synthesis did not complete successfully. Status: {model.status}")
     
         # Log available artifacts for debugging
-        available_artifacts = model.get_artifact_links()
+        available_artifacts = model.get_artifact_list()
         print("Available artifacts:", available_artifacts)
 
         
