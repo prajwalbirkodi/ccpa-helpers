@@ -169,6 +169,15 @@ class CCPAAnonymizer:
         )
         model.submit_cloud()
         quiet_poll(model)
+        
+        if model.status != "COMPLETED":
+            raise Exception(f"Model synthesis did not complete successfully. Status: {model.status}")
+    
+        # Log available artifacts for debugging
+        available_artifacts = model.get_artifact_links()
+        print("Available artifacts:", available_artifacts)
+        
+        
         with open(model.get_artifact_link("report_json.json")) as fh:
             self.ner_report = json.loads(fh.read())
 
