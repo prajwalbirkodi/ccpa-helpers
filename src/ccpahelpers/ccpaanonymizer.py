@@ -175,7 +175,7 @@ class CCPAAnonymizer:
         rh = model.create_record_handler_obj(data_source=df)
         rh.submit_cloud()
         quiet_poll(rh)
-        with open(rh.get_artifact_link("run_report_json")) as fh:
+        with open(rh.get_artifact_link("report_json")) as fh:
             self.run_report = json.loads(fh.read())
         self.deid_df = pd.read_csv(rh.get_artifact_link("data"), compression="gzip")
         self.deid_df.to_csv(self.deidentified_path, index=False)
@@ -210,7 +210,7 @@ class CCPAAnonymizer:
         model = self.project.create_model_obj(config, data_source=self.deid_df)
         model.submit_cloud()
         quiet_poll(model)
-        with open(model.get_artifact_link("run_report_json")) as fh:
+        with open(model.get_artifact_link("report_json")) as fh:
             self.syn_report = json.loads(fh.read())
         self.synthetic_df = pd.read_csv(model.get_artifact_link("data"), compression="gzip")
         self.synthetic_df.to_csv(self.anonymized_path, index=False)
