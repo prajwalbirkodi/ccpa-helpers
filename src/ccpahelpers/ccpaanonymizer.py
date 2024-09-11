@@ -210,6 +210,22 @@ class CCPAAnonymizer:
         model = self.project.create_model_obj(config, data_source=self.deid_df)
         model.submit_cloud()
         quiet_poll(model)
+        
+            # Check model status before fetching artifacts
+        if model.status != "COMPLETED":
+            raise Exception(f"Model synthesis did not complete successfully. Status: {model.status}")
+    
+        # Log available artifacts for debugging
+        available_artifacts = model.get_artifact_links()
+        print("Available artifacts:", available_artifacts)
+
+        # Check if "run_report_json" exists before attempting to open it
+        if "run_report_json" in available_artifacts:
+            with open(model.get_artifact_link("run_report_json")) as fh:
+            self.syn_report = json.loads(fh.read())
+        else:
+            raise Exception("run_report_json artifact not found.")
+        
         with open(model.get_artifact_link("report_json.json")) as fh:
             self.syn_report = json.loads(fh.read())
         self.synthetic_df = pd.read_csv(model.get_artifact_link("data"), compression="gzip")
