@@ -5,3 +5,4 @@ setuptools_scm
 gretel-client
 smart_open
 streamlit
+tabulate>=0.8.10
