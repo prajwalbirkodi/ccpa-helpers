@@ -1,6 +1,6 @@
 setuptools
 setuptools_scm
-pandas=0.9.0
+pandas==0.9.0
 gretel-client
 smart_open
 streamlit
