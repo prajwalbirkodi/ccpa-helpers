@@ -2,6 +2,8 @@ numpy==1.24.3
 pandas==2.1.0
 setuptools
 setuptools_scm
+tabulate>=0.8.10
+Cython==0.29.36
 gretel-client
 smart_open
 streamlit
