@@ -11,6 +11,8 @@ from gretel_client.projects.models import read_model_config
 from pkg_resources import resource_filename
 from smart_open import open
 
+from gretel_client.projects.records import RecordHandler
+
 from . import reports
 from .helpers import quiet_poll
 
@@ -163,30 +165,40 @@ class CCPAAnonymizer:
         self.deid_df.to_csv(self.deidentified_path, index=False)
 
     def _transform_cloud(self, config: dict):
+        # Submit the model to the cloud for transformation
         df = pd.read_csv(self.training_path)
         model = self.project.create_model_obj(
             config, data_source=df.head(self.preview_recs)
         )
         model.submit_cloud()
-        quiet_poll(model)
-        
-        print(f"Model synthesis did not complete successfully. Status: {model.status}")
-    
-        # Log available artifacts for debugging
-        available_artifacts = model.get_artifact_list()
-        print("Available artifacts:", available_artifacts)
-        
-        
-        with open(model.get_artifact_link("report_json.json")) as fh:
-            self.ner_report = json.loads(fh.read())
+        quiet_poll(model)  # Wait for model to complete
 
-        rh = model.create_record_handler_obj(data_source=df)
-        rh.submit_cloud()
-        quiet_poll(rh)
-        with open(rh.get_artifact_link("report_json.json")) as fh:
-            self.run_report = json.loads(fh.read())
-        self.deid_df = pd.read_csv(rh.get_artifact_link("data"), compression="gzip")
-        self.deid_df.to_csv(self.deidentified_path, index=False)
+
+        status = model.status.value
+        print(f"Model Status: '{status}'")
+
+        # Ensure case-insensitive check for 'COMPLETED'
+        if status == "completed":
+            print("The status contains 'COMPLETED'.")
+
+
+            # Create a RecordHandler to manage the artifacts
+            record_handler = RecordHandler(model)
+
+            # Try to fetch the 'run_report_json' artifact (NER report)
+            with open(model.get_artifact_link("report_json")) as fh:
+                self.ner_report = json.loads(fh.read())
+
+            rh = model.create_record_handler_obj(data_source=df)
+            rh.submit_cloud()
+            quiet_poll(rh)
+            with open(rh.get_artifact_link("run_report_json")) as fh:
+                self.run_report = json.loads(fh.read())
+            self.deid_df = pd.read_csv(rh.get_artifact_link("data"), compression="gzip")
+            self.deid_df.to_csv(self.deidentified_path, index=False)
+        else:
+            raise Exception(f"Model transformation did not complete successfully. Status: {model.status}")
+
 
     def transform_locally(self):
         config = read_model_config(self.transforms_config)
@@ -223,13 +235,13 @@ class CCPAAnonymizer:
         print(f"Model synthesis did not complete successfully. Status: {model.status}")
     
         # Log available artifacts for debugging
-        available_artifacts = model.get_artifact_list()
-        print("Available artifacts:", available_artifacts)
+        # available_artifacts = model.get_artifact_list()
+        # print("Available artifacts:", available_artifacts)
 
         
-        with open(model.get_artifact_link("report_json.json")) as fh:
+        with open(model.get_artifact_link("report_json")) as fh:
             self.syn_report = json.loads(fh.read())
-        self.synthetic_df = pd.read_csv(model.get_artifact_link("data"), compression="gzip")
+        self.synthetic_df = pd.read_csv(model.get_artifact_link("data_preview"), compression="gzip")
         self.synthetic_df.to_csv(self.anonymized_path, index=False)
         pickle.dump(self.syn_report, open(self._cache_syn_report, "wb"))
 
